@@ -61,7 +61,7 @@ async def repo_installation_added(event, gh, *args, **kwargs):
     print(f"Access token: {installation_access_token}")
 
     for repository in event.data['repositories']:
-        url = f"/repos/{repository['full_name']}/issues/"
+        url = f"/{repository['full_name']}/issues/"
         print(f"Processing repo: {repository}, url: {url}")
         response = await gh.post(
             url,
