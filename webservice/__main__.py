@@ -57,9 +57,11 @@ async def repo_installation_added(event, gh, *args, **kwargs):
     )
     maintainer = event.data["sender"]["login"]
     message = f"Thanks for installing me, @{maintainer}! (I'm a bot)."
+    print(f"Instalation id: {installation_id}, maintainer: {maintainer}")
 
     for repository in event.data['repositories']:
         url = f"/repos/{repository['full_name']}/issues/"
+        print(f"Processing repo: {repository}, url: {url}")
         response = await gh.post(
             url,
             data={
@@ -69,11 +71,13 @@ async def repo_installation_added(event, gh, *args, **kwargs):
             oauth_token=installation_access_token["token"],
         )
         issue_url = response["url"]
-        await gh.patch(
+        print(f"post to issues response {response}")
+        response = await gh.patch(
             issue_url,
             data={"state": "closed"},
             oauth_token=installation_access_token["token"]
         )
+        print(f"patch to close issue: {response}")
 
     pass
 
