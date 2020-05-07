@@ -47,8 +47,13 @@ async def webhook(request):
 
 @router.register("pull_request", action="opened")
 async def pr_opened(event, gh, *args, **kwargs):
-    print(event.data)
-    print(gh.oauth_token)
+    installation_access_token = await apps.get_installation_access_token(
+        gh,
+        installation_id=installation_id,
+        app_id=os.environ.get("GH_APP_ID"),
+        private_key=os.environ.get("GH_PRIVATE_KEY")
+    )
+    print(f"Access token: {installation_access_token}")
 
 
 @router.register("installation", action="created")
