@@ -47,6 +47,7 @@ async def webhook(request):
 
 @router.register("pull_request", action="opened")
 async def pr_opened(event, gh, *args, **kwargs):
+    pass
     installation_id = event.data["installation"]["id"]
     installation_access_token = await apps.get_installation_access_token(
         gh,
