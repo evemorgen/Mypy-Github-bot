@@ -45,6 +45,12 @@ async def webhook(request):
         traceback.print_exc(file=sys.stderr)
         return web.Response(status=500)
 
+@router.register("pull_request", action="opened")
+async def pr_opened(event, gh, *args, **kwargs):
+    print(event["data"])
+    print(dir(gh))
+    
+
 
 @router.register("installation", action="created")
 async def repo_installation_added(event, gh, *args, **kwargs):
@@ -62,6 +68,7 @@ async def repo_installation_added(event, gh, *args, **kwargs):
 
     for repository in event.data['repositories']:
         url = f"/repos/{repository['full_name']}/issues"
+        url = f"/repos/{repository['full_name']}/issues/"
         print(f"Processing repo: {repository}, url: {url}")
         response = await gh.post(
             url,
