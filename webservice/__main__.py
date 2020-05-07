@@ -48,8 +48,7 @@ async def webhook(request):
 @router.register("pull_request", action="opened")
 async def pr_opened(event, gh, *args, **kwargs):
     print(event.data)
-    print(dir(gh))
-    
+    print(gh.oauth_token)
 
 
 @router.register("installation", action="created")
