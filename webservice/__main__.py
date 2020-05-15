@@ -2,7 +2,7 @@ import asyncio
 import os
 import sys
 import traceback
-
+from pprint import pprint
 
 import aiohttp
 from aiohttp import web
@@ -45,9 +45,9 @@ async def webhook(request):
         traceback.print_exc(file=sys.stderr)
         return web.Response(status=500)
 
+
 @router.register("pull_request", action="opened")
 async def pr_opened(event, gh, *args, **kwargs):
-    pass
     installation_id = event.data["installation"]["id"]
     installation_access_token = await apps.get_installation_access_token(
         gh,
@@ -56,6 +56,12 @@ async def pr_opened(event, gh, *args, **kwargs):
         private_key=os.environ.get("GH_PRIVATE_KEY")
     )
     print(f"Access token: {installation_access_token}")
+    pprint(event)
+
+
+
+def generate_repo_url(access_token, repo_name):
+    return f"https://x-access-token:{access_token}@github.com/{repo_name}.git"
 
 
 @router.register("installation", action="created")
@@ -73,27 +79,16 @@ async def repo_installation_added(event, gh, *args, **kwargs):
     print(f"Access token: {installation_access_token}")
 
     for repository in event.data['repositories']:
-        url = f"/repos/{repository['full_name']}/issues"
-        url = f"/repos/{repository['full_name']}/issues/"
-        print(f"Processing repo: {repository}, url: {url}")
-        response = await gh.post(
-            url,
-            data={
-                "title": "Mariatta's bot was installed",
-                "body": message
-            },
-            oauth_token=installation_access_token["token"],
-        )
-        issue_url = response["url"]
-        print(f"post to issues response {response}")
-        response = await gh.patch(
-            issue_url,
-            data={"state": "closed"},
-            oauth_token=installation_access_token["token"]
-        )
-        print(f"patch to close issue: {response}")
+        clone_url = generate_repo_url(installation_access_token, repository["full_name"])
+        if not os.path.exists(f"./{repo_name}"):
+            repo = Repo()
+            repo.clone_from(url=generate_repo_url(token, repo_name), to_path=f"./{repo_name}")
+        else:
+            repo = Repo(f"./{repo_name}")
 
-    pass
+        print(os.listdir("./"))
+
+
 
 
 if __name__ == "__main__":  # pragma: no cover
