@@ -2,11 +2,12 @@ import asyncio
 import os
 import sys
 import traceback
-from pprint import pprint
+import subprocess
 
 import aiohttp
 from aiohttp import web
 import cachetools
+from git import Repo
 from gidgethub import aiohttp as gh_aiohttp
 from gidgethub import routing
 from gidgethub import sansio
@@ -41,7 +42,7 @@ async def webhook(request):
         except AttributeError:
             pass
         return web.Response(status=200)
-    except Exception as exc:
+    except Exception:
         traceback.print_exc(file=sys.stderr)
         return web.Response(status=500)
 
@@ -55,9 +56,24 @@ async def pr_opened(event, gh, *args, **kwargs):
         app_id=os.environ.get("GH_APP_ID"),
         private_key=os.environ.get("GH_PRIVATE_KEY")
     )
-    print(f"Access token: {installation_access_token}")
-    pprint(event.data)
 
+    branch_from, branch_to = event.data["head"]["ref"], event.data["base"]["ref"]
+    print(f"Access token: {installation_access_token}")
+    print(f"to: {branch_to}")
+    print(f"from: {branch_from}")
+    repo_name = event.data["full_name"]
+
+    subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git fetch --all"])
+    subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git checkout {branch_to}"])
+    result = subprocess.run(["mypy", f"./{repo_name}/."], capture_output=True)
+    first = set(result.stdout.decode().split("\n"))
+    print(f"first: {first}")
+
+    subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git checkout {branch_from}"])
+    result = subprocess.run(["mypy", f"./{repo_name}/."], capture_output=True)
+    second = set(result.stdout.decode().split("\n"))
+    print(f"second: {second}")
+    print(f"diff: {second - first}")
 
 
 def generate_repo_url(access_token, repo_name):
@@ -73,19 +89,16 @@ async def repo_installation_added(event, gh, *args, **kwargs):
         app_id=os.environ.get("GH_APP_ID"),
         private_key=os.environ.get("GH_PRIVATE_KEY")
     )
-    maintainer = event.data["sender"]["login"]
 
     for repository in event.data['repositories']:
-        clone_url = generate_repo_url(installation_access_token, repository["full_name"])
-        if not os.path.exists(f"./{repository['full_name']}"):
+        repo_name = repository["full_name"]
+        if not os.path.exists(f"./{repo_name}"):
             repo = Repo()
-            repo.clone_from(url=generate_repo_url(token, repo_name), to_path=f"./{repository['full_name']}")
+            repo.clone_from(url=generate_repo_url(installation_access_token, repo_name), to_path=f"./{repo_name}")
         else:
-            repo = Repo(f"./{repository['full_name']}")
+            repo = Repo(f"./{repo_name}")
 
         print(os.listdir("./"))
-
-
 
 
 if __name__ == "__main__":  # pragma: no cover
