@@ -58,13 +58,13 @@ async def pr_opened(event, gh, *args, **kwargs):
     )
 
     pr_root = event.data["pull_request"]
-
-    print(dict(event.data))
     branch_from, branch_to = pr_root["head"]["ref"], pr_root["base"]["ref"]
-    print(f"Access token: {installation_access_token}")
     print(f"to: {branch_to}")
     print(f"from: {branch_from}")
     repo_name = event.data["repository"]["full_name"]
+
+    if not os.path.exists(f"/app/{repo_name}"):
+        Repo.clone_from(url=generate_repo_url(installation_access_token["token"], repo_name), to_path=f"/app/{repo_name}")
 
     repo = Repo(f"/app/{repo_name}")
     git = repo.git
