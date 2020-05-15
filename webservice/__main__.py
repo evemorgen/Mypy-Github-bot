@@ -56,7 +56,7 @@ async def pr_opened(event, gh, *args, **kwargs):
         private_key=os.environ.get("GH_PRIVATE_KEY")
     )
     print(f"Access token: {installation_access_token}")
-    pprint(event)
+    pprint(event.data)
 
 
 
