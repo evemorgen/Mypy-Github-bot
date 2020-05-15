@@ -82,9 +82,9 @@ async def repo_installation_added(event, gh, *args, **kwargs):
         clone_url = generate_repo_url(installation_access_token, repository["full_name"])
         if not os.path.exists(f"./{repo_name}"):
             repo = Repo()
-            repo.clone_from(url=generate_repo_url(token, repo_name), to_path=f"./{repo_name}")
+            repo.clone_from(url=generate_repo_url(token, repo_name), to_path=f"./{repository['full_name']}")
         else:
-            repo = Repo(f"./{repo_name}")
+            repo = Repo(f"./{repository['full_name']}")
 
         print(os.listdir("./"))
 
