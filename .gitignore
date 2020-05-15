@@ -1,0 +1,3 @@
+.env
+**/*.sw[pow]
+.mypy_cache
