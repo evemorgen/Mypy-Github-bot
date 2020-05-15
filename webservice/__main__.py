@@ -74,13 +74,10 @@ async def repo_installation_added(event, gh, *args, **kwargs):
         private_key=os.environ.get("GH_PRIVATE_KEY")
     )
     maintainer = event.data["sender"]["login"]
-    message = f"Thanks for installing me, @{maintainer}! (I'm a bot)."
-    print(f"Instalation id: {installation_id}, maintainer: {maintainer}")
-    print(f"Access token: {installation_access_token}")
 
     for repository in event.data['repositories']:
         clone_url = generate_repo_url(installation_access_token, repository["full_name"])
-        if not os.path.exists(f"./{repo_name}"):
+        if not os.path.exists(f"./{repository['full_name']}"):
             repo = Repo()
             repo.clone_from(url=generate_repo_url(token, repo_name), to_path=f"./{repository['full_name']}")
         else:
