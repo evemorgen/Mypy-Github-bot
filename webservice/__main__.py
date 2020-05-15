@@ -66,13 +66,21 @@ async def pr_opened(event, gh, *args, **kwargs):
     print(f"from: {branch_from}")
     repo_name = event.data["repository"]["full_name"]
 
-    subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git fetch --all"])
-    subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git checkout {branch_to}"])
+    repo = Repo(f"/app/{repo_name}")
+    git = repo.git
+
+    git.fetch(all=True)
+    git.checkout(branch_to)
     result = subprocess.run(["mypy", f"./{repo_name}/."], capture_output=True)
+
+    #subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git fetch --all"])
+    #subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git checkout {branch_to}"])
+    #result = subprocess.run(["mypy", f"./{repo_name}/."], capture_output=True)
     first = set(result.stdout.decode().split("\n"))
     print(f"first: {first}")
 
-    subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git checkout {branch_from}"])
+    #subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git checkout {branch_from}"])
+    git.checkout(branch_from)
     result = subprocess.run(["mypy", f"./{repo_name}/."], capture_output=True)
     second = set(result.stdout.decode().split("\n"))
     print(f"second: {second}")
