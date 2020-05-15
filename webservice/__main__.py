@@ -57,12 +57,14 @@ async def pr_opened(event, gh, *args, **kwargs):
         private_key=os.environ.get("GH_PRIVATE_KEY")
     )
 
+    pr_root = event.data["pull_request"]
+
     print(dict(event.data))
-    branch_from, branch_to = event.data["head"]["ref"], event.data["base"]["ref"]
+    branch_from, branch_to = pr_root["head"]["ref"], pr_root["base"]["ref"]
     print(f"Access token: {installation_access_token}")
     print(f"to: {branch_to}")
     print(f"from: {branch_from}")
-    repo_name = event.data["full_name"]
+    repo_name = event.data["repository"]["full_name"]
 
     subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git fetch --all"])
     subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git checkout {branch_to}"])
