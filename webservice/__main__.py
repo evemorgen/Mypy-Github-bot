@@ -57,6 +57,7 @@ async def pr_opened(event, gh, *args, **kwargs):
         private_key=os.environ.get("GH_PRIVATE_KEY")
     )
 
+    print(dict(event.data))
     branch_from, branch_to = event.data["head"]["ref"], event.data["base"]["ref"]
     print(f"Access token: {installation_access_token}")
     print(f"to: {branch_to}")
