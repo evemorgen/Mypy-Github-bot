@@ -84,25 +84,28 @@ async def pr_opened(event, gh, *args, **kwargs):
     for event in second - first:
         if event.startswith("Found"):
             continue
-        print(event)
-        path, line_no, _, error = event.split(":", maxsplit=3)
-        latest_commit_sha = pr_root["head"]["sha"]
-        path = path.replace(repo_name, "")
-        
-        body = {
-            "body": error,
-            "commit_id": latest_commit_sha,
-            "path": path[1:],
-            "position": line_no
-        }
-        print(body)
-        url = f"/repos/{repo_name}/pulls/{pr_root['number']}/comments"
-        print(url)
-        response = await gh.post(
-            f"/repos/{repo_name}/pulls/{pr_root['number']}/comments", 
-            data=body
-        )
-        print(response)
+        try:
+            print(event)
+            path, line_no, _, error = event.split(":", maxsplit=3)
+            latest_commit_sha = pr_root["head"]["sha"]
+            path = path.replace(repo_name, "")
+            
+            body = {
+                "body": error,
+                "commit_id": latest_commit_sha,
+                "path": path[1:],
+                "position": line_no
+            }
+            print(body)
+            url = f"/repos/{repo_name}/pulls/{pr_root['number']}/comments"
+            print(url)
+            response = await gh.post(
+                f"/repos/{repo_name}/pulls/{pr_root['number']}/comments", 
+                data=body
+            )
+            print(response)
+        except Exception:
+            pass
 
 
 def generate_repo_url(access_token, repo_name):
