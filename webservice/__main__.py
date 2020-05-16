@@ -99,6 +99,7 @@ async def pr_opened(event, gh, *args, **kwargs):
             f"/repos/{repo_name}/pulls/{pr_root['number']}/comments", 
             data=body
         )
+        print(response)
 
 
 def generate_repo_url(access_token, repo_name):
