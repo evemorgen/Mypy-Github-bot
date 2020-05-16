@@ -84,6 +84,7 @@ async def pr_opened(event, gh, *args, **kwargs):
     for event in second - first:
         if event.startswith("Found"):
             continue
+        print(event)
         path, line_no, _, error = event.split(":")
         latest_commit_sha = pr_root["head"]["sha"]
         path = path.replace(repo_name, "")
