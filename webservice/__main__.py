@@ -81,6 +81,25 @@ async def pr_opened(event, gh, *args, **kwargs):
     second = set(result.stdout.decode().split("\n"))
     print(f"diff: {second - first}")
 
+    for event in second - first:
+        if event.startswith("Found"):
+            continue
+        path, line_no, _, error = event.split(":")
+        latest_commit_sha = pr_root["head"]["sha"]
+        path = path.replace(repo_name, "")
+        
+        body = {
+            "body": error,
+            "commit_id": latest_commit_sha,
+            "path": path,
+            "position": line_no
+        }
+        print(body)
+        response = await gh.post(
+            f"/repos/{repo_name}/pulls/{pr_root['number']}/comments", 
+            data=body
+        )
+
 
 def generate_repo_url(access_token, repo_name):
     return f"https://x-access-token:{access_token}@github.com/{repo_name}.git"
