@@ -58,6 +58,7 @@ async def pr_opened(event, gh, *args, **kwargs):
     )
 
     pr_root = event.data["pull_request"]
+    print(pr_root)
     branch_from, branch_to = pr_root["head"]["ref"], pr_root["base"]["ref"]
     print(f"to: {branch_to}")
     print(f"from: {branch_from}")
@@ -73,17 +74,11 @@ async def pr_opened(event, gh, *args, **kwargs):
     git.checkout(branch_to)
     result = subprocess.run(["mypy", f"./{repo_name}/."], capture_output=True)
 
-    #subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git fetch --all"])
-    #subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git checkout {branch_to}"])
-    #result = subprocess.run(["mypy", f"./{repo_name}/."], capture_output=True)
     first = set(result.stdout.decode().split("\n"))
-    print(f"first: {first}")
 
-    #subprocess.run(["bash", "-c", f"cd ./{repo_name}/ && git checkout {branch_from}"])
     git.checkout(branch_from)
     result = subprocess.run(["mypy", f"./{repo_name}/."], capture_output=True)
     second = set(result.stdout.decode().split("\n"))
-    print(f"second: {second}")
     print(f"diff: {second - first}")
 
 
