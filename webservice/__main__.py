@@ -92,10 +92,12 @@ async def pr_opened(event, gh, *args, **kwargs):
         body = {
             "body": error,
             "commit_id": latest_commit_sha,
-            "path": path,
+            "path": path[1:],
             "position": line_no
         }
         print(body)
+        url = f"/repos/{repo_name}/pulls/{pr_root['number']}/comments"
+        print(url)
         response = await gh.post(
             f"/repos/{repo_name}/pulls/{pr_root['number']}/comments", 
             data=body
