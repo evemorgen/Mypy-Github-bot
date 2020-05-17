@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "mypy-github-bot"
+version = "0.1.0"
+description = ""
+authors = ["Patryk Galczynski <galczynski.patryk@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+aiohttp = "~3.6.2"
+gidgethub = "~4.1.0"
+PyJWT = "~1.7.1"
+cryptography = "~2.9.2"
+cachetools = "~4.1.0"
+gitpython = "~3.1.2"
+mypy = "~0.770"
+unidiff = "~0.6.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^3.4"
+aiohttp-devtools = "0.*"
+
+[tool.black]
+line-length = 120
+target-version = ['py38']
