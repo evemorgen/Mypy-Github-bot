@@ -1,3 +1,5 @@
 .env
 **/*.sw[pow]
 .mypy_cache
+evemorgen
+**/__pycache__
