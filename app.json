@@ -1,5 +1,5 @@
 {
-  "name": "GitHub App Boilerplate Repo",
-  "description": "A starter repo for building a GitHub App",
-  "repository": "https://github.com/mariatta/github_app_boilerplate"
+  "name": "Mypy Github bot",
+  "description": "Test github app posting mypy errors in PR comments",
+  "repository": "https://github.com/evemorgen/Mypy-Github-bot"
 }
