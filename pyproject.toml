@@ -18,7 +18,13 @@ unidiff = "~0.6.0"
 [tool.poetry.dev-dependencies]
 pytest = "^3.4"
 aiohttp-devtools = "0.*"
+flake8 = "^3.8.2"
 
 [tool.black]
 line-length = 120
 target-version = ['py38']
+
+
+[mypy]
+python_version = 3.7
+ignore_missing_imports = true
