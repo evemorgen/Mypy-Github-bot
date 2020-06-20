@@ -4,3 +4,4 @@
 evemorgen
 **/__pycache__
 .vscode
+.pytest_cache
