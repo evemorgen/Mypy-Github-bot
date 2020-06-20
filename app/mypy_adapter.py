@@ -1,19 +1,14 @@
 from __future__ import annotations
-from dataclasses import dataclass
+
+import itertools
 import logging
 import subprocess
-import itertools
-from typing import Set, List, Iterable, Optional, TYPE_CHECKING
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Iterable, List, Optional, Set
 
-from app.git_operations import (
-    config,
-    clone_repo,
-    get_pr_diff,
-    submit_review,
-    get_pr_reviews,
-    get_pr_comments,
-    resolve_gh_comment,
-)
+from app.git_operations import (clone_repo, config, get_pr_comments,
+                                get_pr_diff, get_pr_reviews,
+                                resolve_gh_comment, submit_review)
 
 if TYPE_CHECKING:
     from unidiff import Hunk, PatchSet
