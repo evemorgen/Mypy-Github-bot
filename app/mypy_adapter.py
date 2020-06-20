@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+import logging
 import subprocess
 import itertools
 from typing import Set, List, Iterable, Optional, TYPE_CHECKING
@@ -16,6 +17,9 @@ from app.git_operations import (
 
 if TYPE_CHECKING:
     from unidiff import Hunk, PatchSet
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -36,8 +40,8 @@ class MypyError:
 
 
 def perform_mypy_check(repo_prefix: str, repo_name: str) -> Set[str]:
+    logger.info(f"Running mypy against {repo_name}")
     result = subprocess.run(["mypy", config.MYPY_ADDITIONAL_ARGS, f"{repo_prefix}/{repo_name}/"], capture_output=True)
-    print(result)
     return set(result.stdout.decode().split("\n"))
 
 
@@ -74,15 +78,18 @@ async def perform_mypy_thing(event, gh):
     latest_commit_sha = pr_root["head"]["sha"]
 
     repo = await clone_repo(repo_name, gh, event)
+
     git = repo.git
     git.fetch(all=True)
     git.pull("origin", branch_to)
+    logger.info(f"Pulling {branch_to} in {repo_name}.")
 
     git.checkout(branch_to)
-    # first = perform_mypy_check(config.REPOS_PREFIX, repo_name)
 
     git.checkout(branch_from)
     git.pull("origin", branch_from)
+    logger.info(f"Pulling {branch_from} in {repo_name}.")
+
     second = perform_mypy_check(config.REPOS_PREFIX, repo_name)
 
     diff = await get_pr_diff(repo_name, pr_root["number"], gh, event)
