@@ -5,3 +5,4 @@ evemorgen
 **/__pycache__
 .vscode
 .pytest_cache
+mypy-bot.code-workspace
