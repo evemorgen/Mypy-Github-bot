@@ -21,6 +21,7 @@ aiohttp-devtools = "0.*"
 flake8 = "^3.8.2"
 black = "^19.10b0"
 isort = {version = "^4.3.21", extras = ["pyproject"]}
+pytest-mock = "^3.1.1"
 
 [tool.black]
 line-length = 120
@@ -33,11 +34,16 @@ include_trailing_comma = true
 force_grid_wrap = 0
 use_parentheses = true
 
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["tests"]
+env = ["GH_SECRET=mock-gh-secret"]
+
 [tool.mypy-bot]
 starting_points = ["app/main.py"]
 additional_mypy_opts = "--ignore-missing-imports --strict-equality"
 
 [mypy]
-python_version = 3.7
+python_version = 3.8
 ignore_missing_imports = true
 

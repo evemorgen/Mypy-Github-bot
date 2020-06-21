@@ -113,7 +113,7 @@ async def submit_review(repo_name, pr_number, payload, gh, event):
         "body": comment_body,
         "commit_id": payload["commit_sha"],
         "event": "COMMENT",
-        "comments": [{"path": err.file, "position": err.diff_position, "body": str(err),} for err in payload["body"]],
+        "comments": [{"path": err.file, "position": err.diff_position, "body": str(err)} for err in payload["body"]],
     }
     url = f"/repos/{repo_name}/pulls/{pr_number}/reviews"
     installation_access_token = await get_github_token(gh, event)

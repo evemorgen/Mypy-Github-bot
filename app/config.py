@@ -1,6 +1,6 @@
+import dataclasses
 import logging
 import os
-from dataclasses import dataclass
 from typing import List
 
 import toml
@@ -20,22 +20,25 @@ PORT = int(os.environ.get("PORT", 3000))
 MYPY_ADDITIONAL_ARGS = "--ignore-missing-imports"
 
 
-@dataclass
+@dataclasses.dataclass
 class RepoOpts:
-    starting_points: List[str] = ["."]
+    starting_points: List[str] = dataclasses.field(default_factory=lambda: ["."])
     additional_mypy_opts: str = ""
 
 
 def get_repo_configuration(repo_name: str) -> RepoOpts:
-    configuration = {}
     try:
         toml_dict = toml.load(f"{REPOS_PREFIX}/{repo_name}/pyproject.toml")
         configuration = toml_dict["tool"]["mypy-bot"]
+        print(configuration)
+        return RepoOpts(**configuration)
     except FileNotFoundError:
         logger.warning(f"No pyproject.toml found in {REPOS_PREFIX}/{repo_name}")
     except toml.decoder.TomlDecodeError:
         logger.warning(f"pyproject.toml in {REPOS_PREFIX}/{repo_name} is invalid.")
     except KeyError:
         logger.warning("No mypy-bot configuration found in pyproject.toml")
+    except TypeError:
+        logger.warning("Illegal parameter value in pyproject toml")
 
-    return RepoOpts(**configuration)
+    return RepoOpts()
