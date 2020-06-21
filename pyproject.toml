@@ -19,13 +19,25 @@ unidiff = "~0.6.0"
 pytest = "^3.4"
 aiohttp-devtools = "0.*"
 flake8 = "^3.8.2"
-isort = "^4.3.21"
 black = "^19.10b0"
+isort = {version = "^4.3.21", extras = ["pyproject"]}
 
 [tool.black]
 line-length = 120
 target-version = ['py38']
 
+[tool.isort]
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+
+[tool.mypy-bot]
+starting_points = ["app/main.py"]
+additional_mypy_opts = "--ignore-missing-imports --strict-equality"
+
 [mypy]
 python_version = 3.7
 ignore_missing_imports = true
+

@@ -6,9 +6,16 @@ import subprocess
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Iterable, List, Optional, Set
 
-from app.git_operations import (clone_repo, config, get_pr_comments,
-                                get_pr_diff, get_pr_reviews,
-                                resolve_gh_comment, submit_review)
+from app.config import get_repo_configuration
+from app.git_operations import (
+    clone_repo,
+    config,
+    get_pr_comments,
+    get_pr_diff,
+    get_pr_reviews,
+    resolve_gh_comment,
+    submit_review,
+)
 
 if TYPE_CHECKING:
     from unidiff import Hunk, PatchSet
@@ -36,7 +43,12 @@ class MypyError:
 
 def perform_mypy_check(repo_prefix: str, repo_name: str) -> Set[str]:
     logger.info(f"Running mypy against {repo_name}")
-    result = subprocess.run(["mypy", config.MYPY_ADDITIONAL_ARGS, f"{repo_prefix}/{repo_name}/"], capture_output=True)
+    repo_opts = get_repo_configuration(repo_name)
+    result = subprocess.run(
+        ["mypy", repo_opts.additional_mypy_opts, *[f"{file}" for file in repo_opts.starting_points]],
+        capture_output=True,
+        cwd=f"{repo_prefix}/{repo_name}",
+    )
     return set(result.stdout.decode().split("\n"))
 
 
