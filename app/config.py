@@ -17,8 +17,6 @@ GH_PRIVATE_KEY = os.environ["GH_PRIVATE_KEY"]
 GH_REVIEW_USER = 64769253
 PORT = int(os.environ.get("PORT", 3000))
 
-MYPY_ADDITIONAL_ARGS = "--ignore-missing-imports"
-
 
 @dataclasses.dataclass
 class RepoOpts:
@@ -28,9 +26,9 @@ class RepoOpts:
 
 def get_repo_configuration(repo_name: str) -> RepoOpts:
     try:
+        logger.info(f"{REPOS_PREFIX}/{repo_name}/pyproject.toml")
         toml_dict = toml.load(f"{REPOS_PREFIX}/{repo_name}/pyproject.toml")
         configuration = toml_dict["tool"]["mypy-bot"]
-        print(configuration)
         return RepoOpts(**configuration)
     except FileNotFoundError:
         logger.warning(f"No pyproject.toml found in {REPOS_PREFIX}/{repo_name}")

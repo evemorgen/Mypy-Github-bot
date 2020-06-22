@@ -6,13 +6,13 @@ import traceback
 import aiohttp
 import cachetools
 from aiohttp import web
-from gidgethub import aiohttp as gh_aiohttp
-from gidgethub import routing, sansio
-
 from app import config
 from app.git_operations import clone_repo
 from app.mypy_adapter import perform_mypy_thing
+from gidgethub import aiohttp as gh_aiohttp
+from gidgethub import routing, sansio
 
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 

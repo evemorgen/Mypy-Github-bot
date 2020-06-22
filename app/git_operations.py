@@ -86,7 +86,7 @@ async def clone_repo(repo_name, gh, event) -> Repo:
         Repo.clone_from(
             url=generate_repo_url(gh_token["token"], repo_name),
             to_path=f"{config.REPOS_PREFIX}/{repo_name}",
-            single_branch=True,
+            # single_branch=True,
         )
 
     repo = Repo(f"{config.REPOS_PREFIX}/{repo_name}")

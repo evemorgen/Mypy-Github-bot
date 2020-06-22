@@ -6,3 +6,5 @@ evemorgen
 .vscode
 .pytest_cache
 mypy-bot.code-workspace
+.coverage
+htmlcov

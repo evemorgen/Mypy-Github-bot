@@ -45,10 +45,19 @@ def perform_mypy_check(repo_name: str) -> Set[str]:
     logger.info(f"Running mypy against {repo_name}")
     repo_opts = get_repo_configuration(repo_name)
     result = subprocess.run(
-        ["mypy", repo_opts.additional_mypy_opts, *[f"{file}" for file in repo_opts.starting_points]],
+        [
+            "bash",
+            "-c",
+            f"cd ./{config.REPOS_PREFIX}/{repo_name} && "
+            + " ".join(
+                ["mypy"]
+                + ([repo_opts.additional_mypy_opts] if repo_opts.additional_mypy_opts else [])
+                + [f"{file}" for file in repo_opts.starting_points]
+            ),
+        ],
         capture_output=True,
-        cwd=f"{config.REPOS_PREFIX}/{repo_name}",
     )
+    logger.debug(f"found errors: {result}")
     return set(elem for elem in result.stdout.decode().split("\n") if elem)
 
 
@@ -58,8 +67,7 @@ def parse_mypy_output(mypy_errors: Iterable[str], repo_name: Optional[str] = Non
         if error.startswith("Found") or error == "" or error.startswith("~~"):
             continue
         file, line_no, severity, error_body = error.split(":", maxsplit=3)
-        # FIXME: why [1:] ???
-        filename = file.replace(repo_name, "")[1:] if repo_name else file
+        filename = file.replace(repo_name, "") if repo_name else file
         parsed_errors.append(MypyError(filename.strip(), int(line_no), severity.strip(), error_body.strip()))
     return parsed_errors
 
@@ -70,6 +78,7 @@ def if_error_in_hunk(error: MypyError, hunk: Hunk) -> bool:
 
 def filter_errors_in_diff(repo_name: str, mypy_errors: Iterable[str], github_diff: PatchSet) -> Iterable[MypyError]:
     parsed_errors = parse_mypy_output(mypy_errors=mypy_errors, repo_name=repo_name)
+    logger.info(parsed_errors)
     filtered_errors = []
     for hunk, error in itertools.product(github_diff, parsed_errors):
         for change in hunk:
@@ -89,10 +98,9 @@ async def perform_mypy_thing(event, gh):
 
     git = repo.git
     git.fetch(all=True)
+    git.checkout(branch_to)
     git.pull("origin", branch_to)
     logger.info(f"Pulling {branch_to} in {repo_name}.")
-
-    git.checkout(branch_to)
 
     git.checkout(branch_from)
     git.pull("origin", branch_from)
@@ -103,6 +111,7 @@ async def perform_mypy_thing(event, gh):
     diff = await get_pr_diff(repo_name, pr_root["number"], gh, event)
 
     mypy_errors = filter_errors_in_diff(repo_name, second, diff)
+    logger.info(mypy_errors)
     reviews = await get_pr_reviews(repo_name, pr_root["number"], gh, event)
     if len(reviews) > 0:
         comments = await get_pr_comments(repo_name, pr_root["number"], gh, event)
